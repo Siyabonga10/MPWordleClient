@@ -84,5 +84,46 @@ namespace MPWordleClient
 
             GridLayout.Add(label, row, col);
         }
+
+        public static void ResetGrid(Grid GridLayout)
+        {
+            foreach (var child in GridLayout.Children)
+            {
+                if (child is Border border)
+                {
+                    Label? label = (Label?)border.Content;
+                    if (label != null)
+                    {
+                        label.Text = "";
+                        border.BackgroundColor = Colors.Transparent;
+                    }
+                }
+            }
+        }
+
+        private static Border? GetKeypad(Grid keyboard, char letter)
+        {
+            foreach (HorizontalStackLayout child in keyboard.Children)
+            {
+                foreach (Border keypad in child.Children)
+                {
+                    Label? label = (Label?)keypad.Content;
+                    if (label != null && label.Text == letter.ToString().ToUpper())
+                    {
+                        return keypad;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static void SetKeypadColor(Grid keyboard, char letter, Color color)
+        {
+            Border? keypad = GetKeypad(keyboard, letter);
+            if (keypad != null)
+            {
+                keypad.BackgroundColor = color;
+            }
+        }
     }
 }

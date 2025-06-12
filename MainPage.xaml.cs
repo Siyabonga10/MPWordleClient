@@ -6,9 +6,14 @@ namespace MPWordleClient
     {
         int RowIndex = 0;
         int ColumnIndex = 0;
+        readonly WordManager GameWords;
+        string currentWord;
         public MainPage()
         {
             InitializeComponent();
+            GameWords = new WordManager("FiveLetterWords.txt");
+            currentWord = GameWords.GenerateRandomWord().ToUpperInvariant();
+            
             InitialiseGrid();
             InitialiseKeyboard();
         }
@@ -33,6 +38,17 @@ namespace MPWordleClient
             }
         }
 
+        private void Reset()
+        {
+            currentWord = GameWords.GenerateRandomWord().ToUpperInvariant();
+            RowIndex = 0;
+            ColumnIndex = 0;
+
+            WordleUI.ResetGrid(GridLayout);
+            Keyboard.Children.Clear();
+            InitialiseKeyboard();
+        }
+
         private HorizontalStackLayout CreateKeypadRow(string rowData, bool isEnd)
         {
             HorizontalStackLayout keyboardRow = new()
@@ -46,7 +62,7 @@ namespace MPWordleClient
                 WordleUI.CreateAndAddKeypad(keyboardRow, "Enter", 37 + 37 / 2, 65, OnEnter);
 
             foreach (char letter in rowData.ToUpper())
-                WordleUI.CreateAndAddKeypad(keyboardRow, letter.ToString(), 37, 65, OnEnter);
+                WordleUI.CreateAndAddKeypad(keyboardRow, letter.ToString(), 37, 65, OnKeypadButtonClicked);
 
             if (isEnd)
                 WordleUI.CreateAndAddKeypad(keyboardRow, "Del", 37 + 37 / 2, 65, OnDelete);
@@ -92,7 +108,6 @@ namespace MPWordleClient
 
         public void OnEnter(object? sender, EventArgs e)
         {
-            string ans = "AUDIO";
             if (ColumnIndex != 5)
                 return;
 
@@ -106,30 +121,39 @@ namespace MPWordleClient
                 Label? label = (Label?)currentCell.Content;
                 if (label == null)
                     return;
-
-                if (label.Text == ans[i].ToString())
-                    currentCell.BackgroundColor = Color.FromRgb(0, 100, 0);
-                else if (ans.Contains(label.Text))
+                
+                if (label.Text == currentWord[i].ToString())
                 {
+                    WordleUI.SetKeypadColor(Keyboard, label.Text[0], Color.FromRgb(0, 100, 0));
+                    currentCell.BackgroundColor = Color.FromRgb(0, 100, 0);
+                }
+                else if (currentWord.Contains(label.Text))
+                {
+                    WordleUI.SetKeypadColor(Keyboard, label.Text[0], Color.FromRgb(100, 100, 0));
                     currentCell.BackgroundColor = Color.FromRgb(100, 100, 0);
                     isCorrect = false;
                 }
                 else
+                {
                     isCorrect = false;
+                    WordleUI.SetKeypadColor(Keyboard, label.Text[0], Colors.Transparent); 
+                }
             }
             if (isCorrect)
-            {
-
-            }
-            if (RowIndex == 4)
-            {
-
-            }
+                CreatePopUp( "Congratulations!", "You guessed the word!");
+            else if (RowIndex == 4)
+                CreatePopUp("Game Over", $"The word was: {currentWord}");
             else
             {
                 RowIndex++;
                 ColumnIndex = 0;
             }
+        }
+
+        private async void CreatePopUp(string heading, string message)
+        {
+            await DisplayAlert(heading, message, "OK");
+            Reset();
         }
 
     }
