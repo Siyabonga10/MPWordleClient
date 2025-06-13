@@ -125,5 +125,29 @@ namespace MPWordleClient
                 keypad.BackgroundColor = color;
             }
         }
+
+        public static void SetGridRowColor(Grid gridLayout, int row, List<Color> colors)
+        {
+            for (int col = 0; col < colors.Count; col++)
+            {
+                Border? cell = GetGridElement(gridLayout, row, col);
+                if (cell != null)
+                {
+                    cell.BackgroundColor = colors[col];
+                }
+            }
+        }
+
+        public static void SetKeypadLetterColors(Grid keyboard, string letters, List<Color> colors)
+        {
+            for (int i = 0; i < letters.Length; i++)
+            {
+                char letter = letters[i];
+                if (i < colors.Count)
+                {
+                    SetKeypadColor(keyboard, letter, colors[i]);
+                }
+            }
+        }
     }
 }

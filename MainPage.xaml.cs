@@ -7,13 +7,12 @@ namespace MPWordleClient
         int RowIndex = 0;
         int ColumnIndex = 0;
         readonly WordManager GameWords;
-        string currentWord;
         public MainPage()
         {
             InitializeComponent();
             GameWords = new WordManager("FiveLetterWords.txt");
-            currentWord = GameWords.GenerateRandomWord().ToUpperInvariant();
-            
+            GameWords.GetNewWord();
+
             InitialiseGrid();
             InitialiseKeyboard();
         }
@@ -40,13 +39,13 @@ namespace MPWordleClient
 
         private void Reset()
         {
-            currentWord = GameWords.GenerateRandomWord().ToUpperInvariant();
             RowIndex = 0;
             ColumnIndex = 0;
 
             WordleUI.ResetGrid(GridLayout);
             Keyboard.Children.Clear();
             InitialiseKeyboard();
+            GameWords.GetNewWord();
         }
 
         private HorizontalStackLayout CreateKeypadRow(string rowData, bool isEnd)
@@ -111,38 +110,24 @@ namespace MPWordleClient
             if (ColumnIndex != 5)
                 return;
 
-            bool isCorrect = true;
-            for (int i = 0; i < 5; i++)
+            string word = string.Empty;
+            for(int i = 0; i < 5; i++)
             {
                 Border? currentCell = WordleUI.GetGridElement(GridLayout, RowIndex, i);
                 if (currentCell == null)
                     return;
-
                 Label? label = (Label?)currentCell.Content;
                 if (label == null)
                     return;
-                
-                if (label.Text == currentWord[i].ToString())
-                {
-                    WordleUI.SetKeypadColor(Keyboard, label.Text[0], Color.FromRgb(0, 100, 0));
-                    currentCell.BackgroundColor = Color.FromRgb(0, 100, 0);
-                }
-                else if (currentWord.Contains(label.Text))
-                {
-                    WordleUI.SetKeypadColor(Keyboard, label.Text[0], Color.FromRgb(100, 100, 0));
-                    currentCell.BackgroundColor = Color.FromRgb(100, 100, 0);
-                    isCorrect = false;
-                }
-                else
-                {
-                    isCorrect = false;
-                    WordleUI.SetKeypadColor(Keyboard, label.Text[0], Colors.Transparent); 
-                }
+                word += label.Text.ToUpperInvariant();
             }
-            if (isCorrect)
+            WordResult result = GameWords.GetResults(word);
+            WordleUI.SetGridRowColor(GridLayout, RowIndex, result.colorCodes);
+            WordleUI.SetKeypadLetterColors(Keyboard, word, result.colorCodes);
+            if (result.isCorrect)
                 CreatePopUp( "Congratulations!", "You guessed the word!");
             else if (RowIndex == 4)
-                CreatePopUp("Game Over", $"The word was: {currentWord}");
+                CreatePopUp("Game Over", $"The word was: {GameWords.CurrentWord}");
             else
             {
                 RowIndex++;

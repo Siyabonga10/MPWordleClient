@@ -11,6 +11,8 @@ namespace MPWordleClient
     {
         readonly Trie.Trie allWords;
         readonly string[] wordList;
+        public string CurrentWord { get; set; }
+        readonly Dictionary<char, int> letterCount;
         public WordManager(string wordsFilePath)
         {
             allWords = new Trie.Trie();
@@ -19,12 +21,34 @@ namespace MPWordleClient
             {
                 allWords.Insert(word.ToLowerInvariant());
             }
+            CurrentWord = "";
+            letterCount = [];
+            DetermineLetterCount();
+            GetNewWord();
+
         }
 
-        public string GenerateRandomWord()
+        private void DetermineLetterCount()
+        {
+            letterCount.Clear();
+            foreach (char letter in CurrentWord)
+            {
+                if (letterCount.ContainsKey(letter))
+                {
+                    letterCount[letter]++;
+                }
+                else
+                {
+                    letterCount[letter] = 1;
+                }
+            }
+        }
+
+        public void GetNewWord()
         {
             Random rand = new();
-            return wordList[rand.Next(0, wordList.Length - 1)];
+            CurrentWord = wordList[rand.Next(0, wordList.Length - 1)].ToUpperInvariant();
+            DetermineLetterCount();
         }
 
         public bool IsWordValid(string word)
@@ -50,6 +74,39 @@ namespace MPWordleClient
                 Console.WriteLine($"Error loading words from file: {ex.Message}");
                 return Array.Empty<string>();
             }
+        }
+
+        public WordResult GetResults(string userWord)
+        {
+            List<Color> colors = [];
+            bool isCorrect = userWord.Equals(CurrentWord, StringComparison.OrdinalIgnoreCase);
+            for (int i = 0; i < userWord.Length; i++)
+            {
+                char letter = userWord[i].ToString().ToUpperInvariant()[0];
+                if (CurrentWord[i] == letter)
+                {
+                    colors.Add(Colors.Green);
+                    letterCount[letter]--;
+                }
+                else if (letterCount.ContainsKey(letter))
+                {
+                    if (letterCount[letter] > 0)
+                    {
+                        colors.Add(Colors.Yellow);
+                        letterCount[letter]--;
+                    }
+                    else
+                    {
+                        colors.Add(Color.FromRgb(12, 12, 12));
+                    }
+                }
+                else
+                {
+                    colors.Add(Color.FromRgb(12, 12, 12));
+                }
+            }
+            DetermineLetterCount();
+            return new(isCorrect, colors);
         }
 
     }
