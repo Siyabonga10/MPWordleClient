@@ -92,17 +92,17 @@ namespace MPWordleClient
                 {
                     if (letterCount[letter] > 0)
                     {
-                        colors.Add(Colors.Yellow);
+                        colors.Add((Color)Application.Current.Resources["PaleYellow"]);
                         letterCount[letter]--;
                     }
                     else
                     {
-                        colors.Add(Color.FromRgb(12, 12, 12));
+                        colors.Add((Color)Application.Current.Resources["DarkGrey"]);
                     }
                 }
                 else
                 {
-                    colors.Add(Color.FromRgb(12, 12, 12));
+                    colors.Add((Color)Application.Current.Resources["DarkGrey"]);
                 }
             }
             DetermineLetterCount();

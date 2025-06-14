@@ -5,6 +5,8 @@ namespace MPWordleClient
 {
     public class WordleUI
     {
+        public static int DisplayHeight { get; set; } = 0;
+        public static int DisplayWidth { get; set; } = 0;
         public static Border? GetGridElement(Grid grid, int row, int col)
         {
             return (Border?)grid.Children
@@ -15,7 +17,7 @@ namespace MPWordleClient
         {
             Border keypad = new()
             {
-                BackgroundColor = Color.FromRgb(80, 80, 80),
+                BackgroundColor = Application.Current.Resources["LightGrey"] as Color ?? Colors.LightGray,
                 StrokeThickness = 0,
                 StrokeShape = new RoundRectangle
                 {
@@ -62,9 +64,11 @@ namespace MPWordleClient
 
         public static void CreateAndAddGridCell(Grid GridLayout, int row, int col)
         {
+            var dimension = DisplayWidth / 7;
+            dimension = Math.Clamp(dimension, 40, 90); // Ensure a reasonable size
             Border label = new()
             {
-                Stroke = new SolidColorBrush(Color.FromRgb(70, 70, 70)),
+                Stroke = new SolidColorBrush((Color)Application.Current.Resources["BorderAccent"]),
                 StrokeThickness = 2,
                 StrokeShape = new RoundRectangle
                 {
@@ -74,8 +78,8 @@ namespace MPWordleClient
                 {
                     FontSize = 26,
                     FontAttributes = FontAttributes.Bold,
-                    HeightRequest = 70,
-                    WidthRequest = 60,
+                    HeightRequest = dimension,
+                    WidthRequest = dimension,
                     TextColor = Colors.White,
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center,
@@ -96,6 +100,8 @@ namespace MPWordleClient
                     {
                         label.Text = "";
                         border.BackgroundColor = Colors.Transparent;
+                        border.RotationX = 0; 
+
                     }
                 }
             }
@@ -122,19 +128,12 @@ namespace MPWordleClient
             Border? keypad = GetKeypad(keyboard, letter);
             if (keypad != null)
             {
-                keypad.BackgroundColor = color;
-            }
-        }
-
-        public static void SetGridRowColor(Grid gridLayout, int row, List<Color> colors)
-        {
-            for (int col = 0; col < colors.Count; col++)
-            {
-                Border? cell = GetGridElement(gridLayout, row, col);
-                if (cell != null)
-                {
-                    cell.BackgroundColor = colors[col];
-                }
+                if (keypad.BackgroundColor == Application.Current.Resources["PaleGreen"] as Color)
+                    return;
+                else if (keypad.BackgroundColor == Application.Current.Resources["PaleYellow"] && color == Application.Current.Resources["PaleGreen"])
+                    keypad.BackgroundColor = color;
+                else if (keypad.BackgroundColor == Application.Current.Resources["LightGrey"] || keypad.BackgroundColor == Application.Current.Resources["DarkGrey"])
+                    keypad.BackgroundColor = color;
             }
         }
 
@@ -149,5 +148,28 @@ namespace MPWordleClient
                 }
             }
         }
+        public static async Task SetGridRowColor(Grid gridLayout, int row, List<Color> colors)
+        {
+            for (int col = 0; col < colors.Count; col++)
+            {
+                Border? cell = GetGridElement(gridLayout, row, col);
+                if (cell != null)
+                {
+                    cell.BackgroundColor = colors[col];
+                    await AnimateGridRow(gridLayout, row, col);
+                }
+            }
+        }
+        public static async Task AnimateGridRow(Grid gridLayout, int row, int col)
+        {
+            Border? cell = GetGridElement(gridLayout, row, col);
+            Label? label = (Label?)cell.Content;
+            string tmp = label?.Text ?? string.Empty;
+            if (cell != null)
+            {
+                await cell.RotateXTo(cell.RotationX + 360, 400, Easing.SinInOut);
+            }          
+        }
+
     }
 }

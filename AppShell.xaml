@@ -7,7 +7,6 @@
     Title="MPWordleClient">
 
     <ShellContent
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-
+        ContentTemplate="{DataTemplate local:GameCreation}"
+        Route="GameCreation" />
 </Shell>

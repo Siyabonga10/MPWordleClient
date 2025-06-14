@@ -2,19 +2,31 @@
 
 namespace MPWordleClient
 {
-    public partial class MainPage : ContentPage
+    public partial class Gameplay : ContentPage
     {
         int RowIndex = 0;
         int ColumnIndex = 0;
         readonly WordManager GameWords;
-        public MainPage()
+        readonly int height;
+        readonly int width;
+        Task? computingResult;
+        public Gameplay()
         {
+            computingResult = null;
             InitializeComponent();
             GameWords = new WordManager("FiveLetterWords.txt");
             GameWords.GetNewWord();
 
+            var sizeInfo = DeviceDisplay.Current.MainDisplayInfo;
+            height = (int)(sizeInfo.Height / sizeInfo.Density);
+            width = (int)(sizeInfo.Width / sizeInfo.Density);
+
+            WordleUI.DisplayHeight = height;
+            WordleUI.DisplayWidth = width;
+
             InitialiseGrid();
             InitialiseKeyboard();
+
         }
 
         private void InitialiseGrid()
@@ -22,6 +34,8 @@ namespace MPWordleClient
             for (int i = 0; i < 5; i++)
                 for (int j = 0; j < 5; j++)
                     WordleUI.CreateAndAddGridCell(GridLayout, i, j);
+
+            GridLayout.Padding = new Thickness(0, 0.2 * height, 0, 0);
         }
 
         private void InitialiseKeyboard()
@@ -50,6 +64,9 @@ namespace MPWordleClient
 
         private HorizontalStackLayout CreateKeypadRow(string rowData, bool isEnd)
         {
+            var dimension = width / 11;
+            dimension = Math.Clamp(dimension, 20, 60);
+            var keyHeight = (int)(1.3 * dimension);
             HorizontalStackLayout keyboardRow = new()
             {
                 HorizontalOptions = LayoutOptions.Center,
@@ -58,13 +75,13 @@ namespace MPWordleClient
             };
 
             if (isEnd)
-                WordleUI.CreateAndAddKeypad(keyboardRow, "Enter", 37 + 37 / 2, 65, OnEnter);
+                WordleUI.CreateAndAddKeypad(keyboardRow, "Enter", dimension + dimension / 2, keyHeight, OnEnter);
 
             foreach (char letter in rowData.ToUpper())
-                WordleUI.CreateAndAddKeypad(keyboardRow, letter.ToString(), 37, 65, OnKeypadButtonClicked);
+                WordleUI.CreateAndAddKeypad(keyboardRow, letter.ToString(), dimension, keyHeight, OnKeypadButtonClicked);
 
             if (isEnd)
-                WordleUI.CreateAndAddKeypad(keyboardRow, "Del", 37 + 37 / 2, 65, OnDelete);
+                WordleUI.CreateAndAddKeypad(keyboardRow, "Del", dimension + dimension / 2, keyHeight, OnDelete);
             return keyboardRow;
         }
 
@@ -105,9 +122,9 @@ namespace MPWordleClient
             }
         }
 
-        public void OnEnter(object? sender, EventArgs e)
+        public async void OnEnter(object? sender, EventArgs e)
         {
-            if (ColumnIndex != 5)
+            if (ColumnIndex != 5 || computingResult != null)
                 return;
 
             string word = string.Empty;
@@ -121,9 +138,20 @@ namespace MPWordleClient
                     return;
                 word += label.Text.ToUpperInvariant();
             }
+            if (!GameWords.IsWordValid(word)) return;
             WordResult result = GameWords.GetResults(word);
-            WordleUI.SetGridRowColor(GridLayout, RowIndex, result.colorCodes);
-            WordleUI.SetKeypadLetterColors(Keyboard, word, result.colorCodes);
+            try
+            {
+                computingResult = WordleUI.SetGridRowColor(GridLayout, RowIndex, result.colorCodes);
+                await computingResult;
+                WordleUI.SetKeypadLetterColors(Keyboard, word, result.colorCodes);
+                computingResult = null;
+            } catch (Exception ex)
+            {
+                Console.WriteLine($"Error setting grid row color: {ex.Message}");
+                return;
+            }
+                 
             if (result.isCorrect)
                 CreatePopUp( "Congratulations!", "You guessed the word!");
             else if (RowIndex == 4)
