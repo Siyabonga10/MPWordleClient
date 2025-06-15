@@ -25,7 +25,7 @@ namespace MPWordleClient
             {
                 await DisplayPromptAsync("Join Game", "Enter the game code:", "Join", "Cancel", "Game Code", 6, keyboard: Keyboard.Numeric);
                 // This is where I'd be querrying the server to join the game but for now we just go straigh to the waiting room
-                await Shell.Current.GoToAsync("///Waiting");
+                await Shell.Current.GoToAsync("Waiting");
             }
             catch (Exception ex)
             {

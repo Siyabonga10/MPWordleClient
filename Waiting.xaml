@@ -4,15 +4,26 @@
              x:Class="MPWordleClient.Waiting">
 
     <Grid RowDefinitions="*, Auto" ColumnDefinitions="*">
-        <ScrollView ></ScrollView>
+        <ScrollView >
+			<Label x:Name="WaitingLb"
+				   Text="Game ID: Loading"
+                   VerticalOptions="Start"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   Margin="20" 
+				   TextColor="White"/>
+							
+		</ScrollView>
         <Button Text="Start Game"
                 HorizontalOptions="Fill"
                 FontAttributes="Bold"
                 FontSize="25"
                 TextColor="White"
                 Clicked="OnStartGame"
+                BackgroundColor="{StaticResource PaleGreen}"
                 VerticalOptions="End"
-                HeightRequest="50"/>
+                HeightRequest="50"
+                Margin="20"/>
     </Grid>
 
 </ContentPage>

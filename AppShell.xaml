@@ -10,12 +10,4 @@
         ContentTemplate="{DataTemplate local:GameCreation}"
         Route="GameCreation" />
 
-    <ShellContent
-        ContentTemplate="{DataTemplate local:Gameplay}"
-        Route="Gameplay" />
-
-    <ShellContent
-        ContentTemplate="{DataTemplate local:Waiting}"
-        Route="Waiting" />
-    
 </Shell>
