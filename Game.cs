@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace MPWordleClient
 {
-    public class Game
+    public static class Game
     {
-        public int GameID { get; set; }
+        public static int GameID { get; set; }
+        public static async Task InitGame()
+        {
+            
+        }
     }
 }

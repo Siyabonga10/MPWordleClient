@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MPWordleClient.GameCreation">
-
-    <FlexLayout BackgroundColor="{StaticResource Background}" 
+             x:Class="MPWordleClient.Account">
+    
+        <FlexLayout BackgroundColor="{StaticResource Background}" 
             Direction="Column" 
             JustifyContent="Center"
             AlignItems="Center">
+            
         <Button
-            x:Name="CreateGameBtn"
+            x:Name="LoginBtn"
             FontSize="25"
-            Text="Create Game"
+            Text="Login"
             BackgroundColor="{StaticResource PaleGreen}"
-            Clicked="OnCreateGame"
+            Clicked="OnPlayerLogin"
             Margin="20"
             FontAttributes="Bold"
             TextColor="White"
             />
+        
         <Button
-            x:Name="JoinGameBtn"
+            x:Name="CreateAccBtn"
             FontSize="25"
-            Text="Join Game"
+            Text="Sign up"
             BackgroundColor="{StaticResource PaleGreen}"
-            Clicked="OnJoinGame"
+            Clicked="OnPlayerSignup"
             FontAttributes="Bold"
             TextColor="White"
             />
 
-    </FlexLayout>
+        </FlexLayout>
 </ContentPage>

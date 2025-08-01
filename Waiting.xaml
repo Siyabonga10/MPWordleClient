@@ -11,7 +11,7 @@
                    FontSize="30"
                    FontAttributes="Bold"
                    Margin="20" 
-				   TextColor="White"/>
+				   TextColor="Green"/>
 							
 		</ScrollView>
         <Button Text="Start Game"
