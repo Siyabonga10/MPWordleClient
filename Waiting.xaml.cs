@@ -11,8 +11,6 @@ namespace MPWordleClient
         public Waiting()
         {
             InitializeComponent();
-            WaitingLb.Text = "Game ID:" + Game.GameID.ToString();
-
         }
         private void OnStartGame(Object sender, EventArgs e)
         {

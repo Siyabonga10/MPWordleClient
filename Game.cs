@@ -10,10 +10,10 @@ namespace MPWordleClient
 {
     public static class Game
     {
-        public static int GameID { get; set; }
+        public static string GameID { get; set; } = "Loading";
         public static async Task InitGame()
         {
-            
+            GameID = await MpClient.CreateGame();
         }
     }
 }

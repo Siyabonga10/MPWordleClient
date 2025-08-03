@@ -17,6 +17,7 @@ namespace MPWordleClient
         private async void OnCreateGame(Object sender, EventArgs e)
         {
             await Game.InitGame();
+            await Shell.Current.GoToAsync("Waiting");
         }
 
         private void OnJoinGame(Object sender, EventArgs e)

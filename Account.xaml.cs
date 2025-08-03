@@ -16,7 +16,7 @@ public partial class Account : ContentPage
 		var response = await MpClient.LoginPlayerAsync(username, password);
 		if (response.LoggedIn)
 		{
-			Application.Current.MainPage = new GameCreation();
+			await Navigation.PushAsync(new GameCreation());
         }
 		else
 			await DisplayAlert("Login failed", "", response.OutcomeMsg);
@@ -28,7 +28,7 @@ public partial class Account : ContentPage
 
         var response = await MpClient.CreatePlayerAsync(username, password);
 		if (response.LoggedIn)
-            Application.Current.MainPage = new GameCreation();
+            await Navigation.PushAsync(new GameCreation());
         else
 			await DisplayAlert("Login failed", "", response.OutcomeMsg);
     }

@@ -49,11 +49,23 @@ namespace MPWordleClient
 
         private static async Task<HttpResponseMessage> PlayerAuth(string username, string password, string endpoint)
         {
-            Console.WriteLine("XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOX");
             var body = new { username, password };
             var content = JsonContent.Create(body);
             var response = await HttpClient.PostAsync(BaseUrl + endpoint, content);
             return response;
+        }
+
+        public static async Task<string> CreateGame()
+        {
+            var response = await HttpClient.PostAsync(BaseUrl + "/game", null);
+            if(response.StatusCode == HttpStatusCode.Created)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var jsonDoc = JsonDocument.Parse(content);
+                var gameId = jsonDoc.RootElement.GetProperty("shortId").GetString() ?? string.Empty;
+                return gameId;
+            }
+            return string.Empty;
         }
     }
 }
