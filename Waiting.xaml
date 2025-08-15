@@ -6,17 +6,21 @@
 
     <Grid RowDefinitions="*, Auto" ColumnDefinitions="*">
         <ScrollView >
-            <VerticalStackLayout>
-			<Label x:Name="WaitingLb"
+            <VerticalStackLayout x:Name="PlayersList">
+                <Label x:Name="WaitingLb"
 				   Text="{Binding Source={x:Static local:Game.GameID}}"
                    VerticalOptions="Start"
                    FontSize="30"
                    FontAttributes="Bold"
                    Margin="20" 
 				   TextColor="Green"/>
-            <Label   x:Name="DataLB"
-                    Text="Your long text here that needs to wrap"
-                    LineBreakMode="WordWrap" />
+                <Label
+                   Text="Players in room"
+                   VerticalOptions="Start"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   Margin="20" 
+                   TextColor="Green"/>
             </VerticalStackLayout>
         </ScrollView>
         <Button Text="Start Game"

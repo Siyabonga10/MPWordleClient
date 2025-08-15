@@ -23,8 +23,16 @@ namespace MPWordleClient
 
         public void OnPlayerJoined(Object? sender, string playerUsername)
         {
-            var tmp = BackgroundColor;
-            DataLB.Text += $"\n {playerUsername}\n";
+            Label NewPlayerLb = new()
+            {
+                Text = $"{playerUsername}",
+                VerticalOptions = LayoutOptions.Start,
+                FontSize = 30,
+                Margin = new(50, 0, 0, 0),
+                TextColor = Colors.Black,
+                FontAttributes = FontAttributes.Bold,
+            };
+            PlayersList.Add(NewPlayerLb);
         }
 
         public void OnPlayersInGame(object? sender, List<string> usernames)
