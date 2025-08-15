@@ -14,18 +14,23 @@ namespace MPWordleClient
         {
             InitializeComponent();
             _logger = logger;
-            MpClient.NewStream += OnNewStream;
+            MpClient.PlayerJoinedEvent += OnPlayerJoined;
         }
         private void OnStartGame(Object sender, EventArgs e)
         {
 
         }
 
-        public void OnNewStream(Object? sender, string e)
+        public void OnPlayerJoined(Object? sender, string playerUsername)
         {
             var tmp = BackgroundColor;
-            DataLB.Text += $"\n New Log {e}\n";
+            DataLB.Text += $"\n {playerUsername}\n";
         }
 
+        public void OnPlayersInGame(object? sender, List<string> usernames)
+        {
+            foreach(var username in usernames)
+                OnPlayerJoined(sender, username);
+        }   
     }
 }
