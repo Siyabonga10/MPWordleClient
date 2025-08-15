@@ -109,7 +109,9 @@ namespace MPWordleClient
 
                 while ((line = await reader.ReadLineAsync()) != null &&
                        !_cancellationTokenSource.Token.IsCancellationRequested)
+                {
                     ProcessEventLine(line);
+                }
             }
             catch (Exception ex) {
                 AppLogger.Logger?.LogError($"Got some kind of error {ex.Message}");
@@ -124,59 +126,64 @@ namespace MPWordleClient
 
         private static void ProcessEventLine(string line)
         {
-            switch (CurrentStage)
+            if (CurrentStage == EventParsingStage.WAITING)
             {
-                case (EventParsingStage.WAITING):
-                    if (line.Contains(EventTypes.Event))
+                if (line.Contains(EventTypes.Event))
+                {
+                    var eventType = line.Split(":")[1];
+                    eventType = eventType?.Trim();
+                    if (eventType != null && !EventTypes.AllEvents.Contains(eventType))
                     {
-                        var eventType = line.Split(":")[1];
-                        eventType = eventType?.Trim();
-                        if (eventType != null && !EventTypes.AllEvents.Contains(eventType))
-                        {
-                            CurrentStage = EventParsingStage.WAITING;
-                        }
-                        else
-                        {
-                            CurrentEventType = eventType!;
-                            CurrentStage = EventParsingStage.PARSING_BODY;
-                        }
-                    }
-                    break;
-                case (EventParsingStage.PARSING_BODY):
-                    if (EventHandlers.ContainsKey(CurrentEventType))
-                    {
-                        var handler = EventHandlers[CurrentEventType];
-                        handler(line);
+                        CurrentStage = EventParsingStage.WAITING;
                     }
                     else
-                        if (line == string.Empty)
-                        CurrentStage = EventParsingStage.WAITING;
-                    break;
+                    {
+                        CurrentEventType = eventType!;
+                        CurrentStage = EventParsingStage.PARSING_BODY;
+                    }
+                }
+            }
+                
+            else if (CurrentStage == EventParsingStage.PARSING_BODY)
+            {
+                if (EventHandlers.ContainsKey(CurrentEventType))
+                {
+                    var handler = EventHandlers[CurrentEventType];
+                    handler(line.Trim());
+                }
+                else
+                    if (line == string.Empty)
+                    CurrentStage = EventParsingStage.WAITING;
             }
         }
 
         private static void OnPlayerJoined(string line)
         {
+            
             if (line == string.Empty)
             {
                 CurrentStage = EventParsingStage.WAITING;
                 return;
             }
-            else if (!line.Contains("data"))
+            else if (line.Contains("data"))
+            {
+                line = line.Replace("data: ", "");
                 PlayerJoinedEvent.Invoke(null, line.Trim());
+            }
         }
 
         private static void OnPlayersInGame(string line)
         {
             if(line == string.Empty)
-            {
+            { 
                 CurrentStage = EventParsingStage.WAITING;
                 PlayersInGameEvent.Invoke(null, EventBuffer);
                 EventBuffer.Clear();
                 return;
             }
-            else if(!line.Contains("data"))
+            else if(line.Contains("data"))
             {
+                line = line.Replace("data: ", "");
                 EventBuffer.Add(line.Trim());
             }
         }
