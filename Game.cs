@@ -15,5 +15,18 @@ namespace MPWordleClient
         {
             GameID = await MpClient.CreateGame();
         }
+
+        public static async Task SubscribeToEvents()
+        {
+            await MpClient.SubscribeToGameUpdates(GameID);
+        }
+
+        public static async Task<bool> JoinGame(string gameId)
+        {
+            var joined = await MpClient.JoinGame(gameId);
+            if (joined)
+                GameID = gameId;
+            return joined;
+        }
     }
 }

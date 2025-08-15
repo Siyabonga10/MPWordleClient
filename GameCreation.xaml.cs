@@ -17,11 +17,27 @@ namespace MPWordleClient
         private async void OnCreateGame(Object sender, EventArgs e)
         {
             await Game.InitGame();
-            await Shell.Current.GoToAsync("Waiting");
+            var task1 = Game.SubscribeToEvents();
+            var task2 = Shell.Current.GoToAsync("Waiting");
+         
+            await Task.WhenAll(task1, task2);
         }
 
-        private void OnJoinGame(Object sender, EventArgs e)
+        private async void OnJoinGame(Object sender, EventArgs e)
         {
+            var gameId = await DisplayPromptAsync("Join Game", "Enter the game id");
+            if(await Game.JoinGame(gameId))
+            {
+                Game.GameID = gameId;
+                var task1 = Game.SubscribeToEvents();
+                var task2 = Shell.Current.GoToAsync("Waiting");
+
+                await Task.WhenAll(task1, task2);
+            }
+            else
+            {
+                await DisplayAlert("Join Game", "Could not join game", "ok");
+            }
         }
     }
 }

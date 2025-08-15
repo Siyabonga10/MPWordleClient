@@ -15,9 +15,12 @@ namespace MPWordleClient
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-#if DEBUG
-    		builder.Logging.AddDebug();
-#endif
+            builder.Services.AddLogging(configure =>
+            {
+                configure.AddDebug();
+                configure.AddConsole();
+                configure.SetMinimumLevel(LogLevel.Trace);
+            });
 
             return builder.Build();
         }
