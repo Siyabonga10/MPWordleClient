@@ -23,9 +23,7 @@ namespace MPWordleClient
         public static HttpClient HttpClient { get; }
         public static readonly string BaseUrl = "https://mpwordle-ase2a7h9d9hjhwcn.southafricanorth-01.azurewebsites.net";
         public static event EventHandler<string> PlayerJoinedEvent;
-        public static event EventHandler<List<string>> PlayersInGameEvent;
         private static string CurrentEventType = string.Empty;
-        private static List<string> EventBuffer = [];
         private static EventParsingStage CurrentStage = EventParsingStage.WAITING;
         private static readonly Dictionary<string, EventProcessor> EventHandlers = [];
         static MpClient()
@@ -40,7 +38,7 @@ namespace MPWordleClient
             HttpClient = new HttpClient(handler);
 
             EventHandlers.Add(EventTypes.PlayerJoined, OnPlayerJoined);
-            EventHandlers.Add(EventTypes.PlayersInGame, OnPlayersInGame);
+            EventHandlers.Add(EventTypes.PlayersInGame, OnPlayerJoined);
         }
 
         public static async Task<(bool LoggedIn, string OutcomeMsg)> LoginPlayerAsync(string username, string password)
@@ -89,7 +87,7 @@ namespace MPWordleClient
 
         public static async Task SubscribeToGameUpdates(string gameID)
         {
-            AppLogger.Logger?.LogInformation("Subbing to events");
+            AppLogger.Logger?.LogInformation($"Coming from thread {System.Threading.Thread.CurrentThread.ManagedThreadId}");
             var _cancellationTokenSource = new CancellationTokenSource();
             try
             {
@@ -103,18 +101,19 @@ namespace MPWordleClient
                 response.EnsureSuccessStatusCode();
 
                 using var stream = await response.Content.ReadAsStreamAsync();
-                using var reader = new StreamReader(stream);               
+                using var reader = new StreamReader(stream);
 
                 string? line;
-
-                while ((line = await reader.ReadLineAsync()) != null &&
+                AppLogger.Logger?.LogInformation($"Coming from thread xx {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+                while ((line = await reader.ReadLineAsync(_cancellationTokenSource.Token)) != null &&
                        !_cancellationTokenSource.Token.IsCancellationRequested)
                 {
+                    AppLogger.Logger?.LogInformation($"APP LOG: {line}");
                     ProcessEventLine(line);
                 }
             }
             catch (Exception ex) {
-                AppLogger.Logger?.LogError($"Got some kind of error {ex.Message}");
+                AppLogger.Logger?.LogError(ex, "Operation failed");
             }
         }
 
@@ -169,22 +168,6 @@ namespace MPWordleClient
             {
                 line = line.Replace("data: ", "");
                 PlayerJoinedEvent.Invoke(null, line.Trim());
-            }
-        }
-
-        private static void OnPlayersInGame(string line)
-        {
-            if(line == string.Empty)
-            { 
-                CurrentStage = EventParsingStage.WAITING;
-                PlayersInGameEvent.Invoke(null, EventBuffer);
-                EventBuffer.Clear();
-                return;
-            }
-            else if(line.Contains("data"))
-            {
-                line = line.Replace("data: ", "");
-                EventBuffer.Add(line.Trim());
             }
         }
     }

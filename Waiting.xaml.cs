@@ -34,11 +34,5 @@ namespace MPWordleClient
             };
             PlayersList.Add(NewPlayerLb);
         }
-
-        public void OnPlayersInGame(object? sender, List<string> usernames)
-        {
-            foreach(var username in usernames)
-                OnPlayerJoined(sender, username);
-        }   
     }
 }
