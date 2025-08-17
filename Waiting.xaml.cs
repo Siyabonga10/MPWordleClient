@@ -15,6 +15,7 @@ namespace MPWordleClient
             InitializeComponent();
             _logger = logger;
             MpClient.PlayerJoinedEvent += OnPlayerJoined;
+            MpClient.PlayersInGameEvent += OnPlayersInGame;
         }
         private void OnStartGame(Object sender, EventArgs e)
         {
@@ -34,5 +35,11 @@ namespace MPWordleClient
             };
             PlayersList.Add(NewPlayerLb);
         }
+
+        public void OnPlayersInGame(Object? sender, List<string> usernames)
+        {
+            foreach(var username in usernames)
+                OnPlayerJoined(sender, username);
+        }   
     }
 }
