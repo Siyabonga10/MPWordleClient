@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Storage;
 
 namespace MPWordleClient
 {
@@ -24,10 +25,10 @@ namespace MPWordleClient
         private static List<string> EventBuffer = [];
         private static EventParsingStage CurrentStage = EventParsingStage.WAITING;
         private static readonly Dictionary<string, EventProcessor> EventHandlers = [];
+        private static readonly CookieContainer cookieContainer;
         static MpClient()
         {
-            var cookieContainer = new CookieContainer();
-
+            cookieContainer = new CookieContainer();
             var handler  = new HttpClientHandler
             {
                 CookieContainer = cookieContainer,
@@ -41,6 +42,17 @@ namespace MPWordleClient
             EventHandlers.Add(EventTypes.StartGame, OnStartGame);
         }
 
+        public static async Task<bool> CheckLoggedin()
+        {
+            var token = await SecureStorage.GetAsync("jwt_token");
+            AppLogger.Logger?.LogInformation(HttpClient.BaseAddress?.ToString());
+            if (token == null)
+                return false;
+            
+            cookieContainer.Add(new Uri(BaseUrl), new Cookie("jwt_token", token));
+            AppLogger.Logger?.LogInformation("DONE");
+            return true;
+        }
         public static async Task<(bool LoggedIn, string OutcomeMsg)> LoginPlayerAsync(string username, string password)
         {
             var response = await PlayerAuth(username, password, "/player/login");
@@ -68,6 +80,18 @@ namespace MPWordleClient
             var body = new { username, password };
             var content = JsonContent.Create(body);
             var response = await HttpClient.PostAsync(BaseUrl + endpoint, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var cookies = cookieContainer.GetCookies(new Uri(BaseUrl));
+                if (cookies != null)
+                {
+                    var jwtCookie = cookies["jwt_token"];
+                    if (jwtCookie != null)
+                    {
+                        await SecureStorage.SetAsync("jwt_token", jwtCookie.Value);
+                    }
+                }
+            }
             return response;
         }
 

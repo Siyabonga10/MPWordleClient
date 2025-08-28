@@ -62,8 +62,11 @@ namespace MPWordleClient
                 if (compWord.Contains(letter))
                 {
                     var idx = compWord.FindIndex(lt => lt == letter);
-                    compWord[idx] = '#';
-                    colors[i] = Colors.Yellow;
+                    if(idx != i)
+                    {
+                        compWord[idx] = '#';
+                        colors[i] = Colors.Yellow;
+                    }
                 }
             }
             

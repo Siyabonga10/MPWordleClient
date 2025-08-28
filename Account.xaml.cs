@@ -8,6 +8,12 @@ public partial class Account : ContentPage
 		LoginBtn.WidthRequest = CreateAccBtn.Width;
 	}
 
+    override protected async void OnAppearing()
+	{
+		base.OnAppearing();
+		if(await MpClient.CheckLoggedin())
+            await Navigation.PushAsync(new GameCreation());
+    }
 	public async void OnPlayerLogin(object sender, EventArgs e)
 	{
 		var username = await DisplayPromptAsync("Login", "Username", maxLength: 10);
