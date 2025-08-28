@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace MPWordleClient
@@ -21,8 +16,9 @@ namespace MPWordleClient
     public static class MpClient
     {
         public static HttpClient HttpClient { get; }
-        public static readonly string BaseUrl = "https://mpwordle-ase2a7h9d9hjhwcn.southafricanorth-01.azurewebsites.net";
+        private static readonly string BaseUrl = "http://10.0.2.2:5264";
         public static event EventHandler<string> PlayerJoinedEvent;
+        public static event EventHandler<IEnumerable<string>> StartGame;
         public static event EventHandler<List<string>> PlayersInGameEvent;
         private static string CurrentEventType = string.Empty;
         private static List<string> EventBuffer = [];
@@ -31,6 +27,7 @@ namespace MPWordleClient
         static MpClient()
         {
             var cookieContainer = new CookieContainer();
+
             var handler  = new HttpClientHandler
             {
                 CookieContainer = cookieContainer,
@@ -41,6 +38,7 @@ namespace MPWordleClient
 
             EventHandlers.Add(EventTypes.PlayerJoined, OnPlayerJoined);
             EventHandlers.Add(EventTypes.PlayersInGame, OnPlayersInGame);
+            EventHandlers.Add(EventTypes.StartGame, OnStartGame);
         }
 
         public static async Task<(bool LoggedIn, string OutcomeMsg)> LoginPlayerAsync(string username, string password)
@@ -67,7 +65,6 @@ namespace MPWordleClient
 
         private static async Task<HttpResponseMessage> PlayerAuth(string username, string password, string endpoint)
         {
-            AppLogger.Logger?.LogInformation("Handling player auth");
             var body = new { username, password };
             var content = JsonContent.Create(body);
             var response = await HttpClient.PostAsync(BaseUrl + endpoint, content);
@@ -77,11 +74,13 @@ namespace MPWordleClient
         public static async Task<string> CreateGame()
         {
             var response = await HttpClient.PostAsync(BaseUrl + "/game", null);
+            
             if(response.StatusCode == HttpStatusCode.Created)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var jsonDoc = JsonDocument.Parse(content);
                 var gameId = jsonDoc.RootElement.GetProperty("shortId").GetString() ?? string.Empty;
+
                 return gameId;
             }
             return string.Empty;
@@ -120,6 +119,13 @@ namespace MPWordleClient
         {
             var response = await HttpClient.PutAsync(BaseUrl + $"/game/{gameId}", null);
             return response.StatusCode == HttpStatusCode.NoContent;
+        }
+
+        public static async Task<bool> StartCurrentGame()
+        {
+            var localClient = new HttpClient();
+            var response = await HttpClient.PostAsync(BaseUrl + $"/game/{Game.GameID}/start", null);
+            return response.StatusCode == HttpStatusCode.OK;
         }
 
         private static void ProcessEventLine(string line)
@@ -182,6 +188,21 @@ namespace MPWordleClient
             else if(line.Contains("data"))
             {
                 line = line.Replace("data: ", "");
+                EventBuffer.Add(line.Trim());
+            }
+        }
+
+        private static void OnStartGame(string line)
+        {
+            if(line == string.Empty)
+            {
+                CurrentStage = EventParsingStage.WAITING;
+                StartGame.Invoke(null, EventBuffer);
+                EventBuffer.Clear();
+                return;
+            }
+            else
+            {
                 EventBuffer.Add(line.Trim());
             }
         }

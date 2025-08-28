@@ -16,10 +16,16 @@ namespace MPWordleClient
             _logger = logger;
             MpClient.PlayerJoinedEvent += OnPlayerJoined;
             MpClient.PlayersInGameEvent += OnPlayersInGame;
+            MpClient.StartGame += OnServerStartGame;
         }
-        private void OnStartGame(Object sender, EventArgs e)
+        public async void OnStartGame(object sender,  EventArgs e)
         {
-
+            await MpClient.StartCurrentGame();
+        }
+        private async void OnServerStartGame(Object? sender, IEnumerable<string> words)
+        {
+            WordManager.LoadWords(words);
+            await Shell.Current.GoToAsync("Gameplay");
         }
 
         public void OnPlayerJoined(Object? sender, string playerUsername)

@@ -7,105 +7,66 @@ using System.Threading.Tasks;
 
 namespace MPWordleClient
 {
-    internal class WordManager
+    public static class WordManager
     {
-        readonly Trie.Trie allWords;
-        readonly string[] wordList;
-        public string CurrentWord { get; set; }
-        readonly Dictionary<char, int> letterCount;
-        public WordManager(string wordsFilePath)
+        private static List<string> currentWords = [];
+        public static string CurrentWord = string.Empty;
+        private static int index = 0;
+
+        public static void LoadWords(IEnumerable<string> words)
         {
-            allWords = new Trie.Trie();
-            wordList = LoadWords(wordsFilePath).Result;
-            foreach (string word in wordList)
-            {
-                allWords.Insert(word.ToLowerInvariant());
-            }
-            CurrentWord = "";
-            letterCount = [];
-            DetermineLetterCount();
-            GetNewWord();
-
+            index = 0;
+            CurrentWord = string.Empty;
+            currentWords.Clear();
+            foreach (var word in words)
+                currentWords.Add(word);
         }
-
-        private void DetermineLetterCount()
-        {
-            letterCount.Clear();
-            foreach (char letter in CurrentWord)
-            {
-                if (letterCount.ContainsKey(letter))
-                {
-                    letterCount[letter]++;
-                }
-                else
-                {
-                    letterCount[letter] = 1;
-                }
-            }
-        }
-
-        public void GetNewWord()
+        public static string GetNewWord()
         {
             Random rand = new();
-            CurrentWord = wordList[rand.Next(0, wordList.Length - 1)].ToUpperInvariant();
-            DetermineLetterCount();
+            if (index == currentWords.Count) return string.Empty;
+            CurrentWord = currentWords[index].ToUpperInvariant();
+            index++;
+            return CurrentWord;
         }
 
-        public bool IsWordValid(string word)
+        public static bool IsWordValid(string word)
         {
-            return allWords.Search(word.ToLowerInvariant());
+            return true;
         }
 
-        private static async Task<string[]> LoadWords(string wordsFilePath)
-        {
-            try
-            {
-                using var stream = await FileSystem.OpenAppPackageFileAsync(wordsFilePath);
-                using var reader = new StreamReader(stream);
-                if (reader.EndOfStream)  
-                {
-                    return Array.Empty<string>();
-                }
-                var content = reader.ReadToEnd();
-                return content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading words from file: {ex.Message}");
-                return Array.Empty<string>();
-            }
-        }
+       
 
-        public WordResult GetResults(string userWord)
+        public static WordResult GetResults(string userWord)
         {
             List<Color> colors = [];
+            List<char> compWord = [];
+            foreach(var letter in CurrentWord)
+                compWord.Add(letter);
             bool isCorrect = userWord.Equals(CurrentWord, StringComparison.OrdinalIgnoreCase);
             for (int i = 0; i < userWord.Length; i++)
             {
                 char letter = userWord[i].ToString().ToUpperInvariant()[0];
-                if (CurrentWord[i] == letter)
+                if (compWord[i] == letter)
                 {
+                    compWord[i] = '#';
                     colors.Add(Colors.Green);
-                    letterCount[letter]--;
                 }
-                else if (letterCount.ContainsKey(letter))
-                {
-                    if (letterCount[letter] > 0)
-                    {
-                        colors.Add((Color)Application.Current.Resources["PaleYellow"]);
-                        letterCount[letter]--;
-                    }
-                    else
-                    {
-                        colors.Add((Color)Application.Current.Resources["DarkGrey"]);
-                    }
-                }
+                
                 else
-                {
                     colors.Add((Color)Application.Current.Resources["DarkGrey"]);
+            }
+            for (int i = 0; i < userWord.Length; i++)
+            {
+                char letter = userWord[i].ToString().ToUpperInvariant()[0];
+                if (compWord.Contains(letter))
+                {
+                    var idx = compWord.FindIndex(lt => lt == letter);
+                    compWord[idx] = '#';
+                    colors[i] = Colors.Yellow;
                 }
             }
-            DetermineLetterCount();
+            
             return new(isCorrect, colors);
         }
 

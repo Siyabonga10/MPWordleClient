@@ -6,6 +6,7 @@
         {
             InitializeComponent();
             Routing.RegisterRoute("Waiting", typeof(Waiting));
+            Routing.RegisterRoute("Gameplay", typeof(Gameplay));
         }
     }
 }

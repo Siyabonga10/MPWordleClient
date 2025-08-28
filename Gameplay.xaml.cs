@@ -6,7 +6,6 @@ namespace MPWordleClient
     {
         int RowIndex = 0;
         int ColumnIndex = 0;
-        readonly WordManager GameWords;
         readonly int height;
         readonly int width;
         Task? computingResult;
@@ -14,8 +13,7 @@ namespace MPWordleClient
         {
             computingResult = null;
             InitializeComponent();
-            GameWords = new WordManager("FiveLetterWords.txt");
-            GameWords.GetNewWord();
+            WordManager.GetNewWord();
 
             var sizeInfo = DeviceDisplay.Current.MainDisplayInfo;
             height = (int)(sizeInfo.Height / sizeInfo.Density);
@@ -59,7 +57,7 @@ namespace MPWordleClient
             WordleUI.ResetGrid(GridLayout);
             Keyboard.Children.Clear();
             InitialiseKeyboard();
-            GameWords.GetNewWord();
+            WordManager.GetNewWord();
         }
 
         private HorizontalStackLayout CreateKeypadRow(string rowData, bool isEnd)
@@ -138,8 +136,8 @@ namespace MPWordleClient
                     return;
                 word += label.Text.ToUpperInvariant();
             }
-            if (!GameWords.IsWordValid(word)) return;
-            WordResult result = GameWords.GetResults(word);
+            if (!WordManager.IsWordValid(word)) return;
+            WordResult result = WordManager.GetResults(word);
             try
             {
                 computingResult = WordleUI.SetGridRowColor(GridLayout, RowIndex, result.colorCodes);
@@ -155,7 +153,7 @@ namespace MPWordleClient
             if (result.isCorrect)
                 CreatePopUp( "Congratulations!", "You guessed the word!");
             else if (RowIndex == 4)
-                CreatePopUp("Game Over", $"The word was: {GameWords.CurrentWord}");
+                CreatePopUp("Game Over", $"The word was: {WordManager.CurrentWord}");
             else
             {
                 RowIndex++;
