@@ -19,7 +19,7 @@ namespace MPWordleClient
         {
             await Game.InitGame();
             var task1 = Game.SubscribeToEvents();
-            var task2 = Shell.Current.GoToAsync("Waiting");
+            var task2 = Navigation.PushModalAsync(new Waiting());
             await Task.WhenAll(task1, task2);
         }
 
@@ -28,7 +28,7 @@ namespace MPWordleClient
             var gameId = await DisplayPromptAsync("Join Game", "Enter the game id");
             if (await Game.JoinGame(gameId))
             {
-                await Task.WhenAll(Game.SubscribeToEvents(), Shell.Current.GoToAsync("Waiting"));
+                await Task.WhenAll(Game.SubscribeToEvents(), Navigation.PushModalAsync(new Waiting()));
             }
             else
                 await DisplayAlert("Join Game", "Could not join game", "ok");

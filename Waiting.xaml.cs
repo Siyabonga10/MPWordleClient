@@ -9,11 +9,9 @@ namespace MPWordleClient
 {
     partial class Waiting: ContentPage
     {
-        private readonly ILogger<Waiting> _logger;
-        public Waiting(ILogger<Waiting> logger)
+        public Waiting()
         {
             InitializeComponent();
-            _logger = logger;
             MpClient.PlayerJoinedEvent += OnPlayerJoined;
             MpClient.PlayersInGameEvent += OnPlayersInGame;
             MpClient.StartGame += OnServerStartGame;

@@ -222,7 +222,7 @@ namespace MPWordleClient
 
         public async void OnGameOver(Object? sender, Dictionary<string, int> scores_data)
         {
-            await Navigation.PushAsync(new PostGame(scores_data));
+            await Navigation.PushModalAsync(new PostGame(scores_data));
         }
 
     }

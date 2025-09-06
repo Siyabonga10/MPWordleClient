@@ -12,7 +12,7 @@ public partial class Account : ContentPage
 	{
 		base.OnAppearing();
 		if(await MpClient.CheckLoggedin())
-            await Navigation.PushAsync(new GameCreation());
+            await Navigation.PushModalAsync(new GameCreation());
     }
 	public async void OnPlayerLogin(object sender, EventArgs e)
 	{
@@ -22,7 +22,7 @@ public partial class Account : ContentPage
 		var response = await MpClient.LoginPlayerAsync(username, password);
 		if (response.LoggedIn)
 		{
-			await Navigation.PushAsync(new GameCreation());
+			await Navigation.PushModalAsync(new GameCreation());
         }
 		else
 			await DisplayAlert("Login failed", "", response.OutcomeMsg);
@@ -34,7 +34,7 @@ public partial class Account : ContentPage
 
         var response = await MpClient.CreatePlayerAsync(username, password);
 		if (response.LoggedIn)
-            await Navigation.PushAsync(new GameCreation());
+            await Navigation.PushModalAsync(new GameCreation());
         else
 			await DisplayAlert("Login failed", "", response.OutcomeMsg);
     }
