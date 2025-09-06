@@ -9,23 +9,14 @@
             
         <Button
             x:Name="LoginBtn"
-            FontSize="25"
             Text="Login"
-            BackgroundColor="{StaticResource PaleGreen}"
             Clicked="OnPlayerLogin"
-            Margin="20"
-            FontAttributes="Bold"
-            TextColor="White"
             />
         
         <Button
             x:Name="CreateAccBtn"
-            FontSize="25"
             Text="Sign up"
-            BackgroundColor="{StaticResource PaleGreen}"
             Clicked="OnPlayerSignup"
-            FontAttributes="Bold"
-            TextColor="White"
             />
 
         </FlexLayout>

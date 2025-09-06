@@ -8,31 +8,23 @@
         <ScrollView >
             <VerticalStackLayout x:Name="PlayersList">
                 <Label x:Name="WaitingLb"
-				   Text="{Binding Source={x:Static local:Game.GameID}}"
+				   Text="{Binding Source={x:Static local:Game.GameIDText}}"
                    VerticalOptions="Start"
-                   FontSize="30"
-                   FontAttributes="Bold"
-                   Margin="20" 
-				   TextColor="Green"/>
+                   Padding="30"
+                   Style="{StaticResource BaseLabel}"
+                   />
                 <Label
                    Text="Players in room"
                    VerticalOptions="Start"
-                   FontSize="30"
-                   FontAttributes="Bold"
-                   Margin="20" 
-                   TextColor="Green"/>
+                    Style="{StaticResource BaseLabel}"
+                   />
             </VerticalStackLayout>
         </ScrollView>
         <Button Text="Start Game"
                 HorizontalOptions="Fill"
-                FontAttributes="Bold"
-                FontSize="25"
-                TextColor="White"
                 Clicked="OnStartGame"
-                BackgroundColor="{StaticResource PaleGreen}"
                 VerticalOptions="End"
-                HeightRequest="50"
-                Margin="20"/>
+                />
     </Grid>
 
 </ContentPage>

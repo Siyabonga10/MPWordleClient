@@ -13,6 +13,7 @@ public partial class PostGame : ContentPage
 	private void CreateLeaderboard(Dictionary<string, int> scores)
 	{
 		var sorted_results = scores.OrderByDescending(entry => entry.Value);
+        var style = Application.Current?.Resources["BaseLabel"] as Style;
         foreach(var result in sorted_results)
         {
             var horizontalStack = new FlexLayout()
@@ -25,10 +26,7 @@ public partial class PostGame : ContentPage
             {
                 Text = result.Key,
                 VerticalOptions = LayoutOptions.Start,
-                FontSize = 30,
-                Margin = new(10, 0, 0, 0),
-                TextColor = Colors.Black,
-                FontAttributes = FontAttributes.Bold,
+                Style = style
             };
 
             var score = result.Value == -1 ? "0" : result.Value.ToString(); 
@@ -36,10 +34,7 @@ public partial class PostGame : ContentPage
             {
                 Text = score,
                 VerticalOptions = LayoutOptions.End,
-                FontSize = 30,
-                Margin = new(0, 0, 10, 0),
-                TextColor = Colors.Black,
-                FontAttributes = FontAttributes.Bold,
+                Style = style
             };
 
             horizontalStack.Children.Add(leftLabel);

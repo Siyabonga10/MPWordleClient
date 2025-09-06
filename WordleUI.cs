@@ -18,7 +18,8 @@ namespace MPWordleClient
             Border keypad = new()
             {
       
-                StrokeThickness = 0,
+                StrokeThickness = 2,
+                Stroke = new SolidColorBrush((Color)Application.Current.Resources["BorderAccent"]),
                 StrokeShape = new RoundRectangle
                 {
                     CornerRadius = new CornerRadius(2)
@@ -27,10 +28,11 @@ namespace MPWordleClient
                 {
                     FontAttributes = FontAttributes.Bold,
                     FontSize = 20,
-                    HeightRequest = height,
-                    WidthRequest = width,
+                    HeightRequest = height - 4,
+                    WidthRequest = width - 4,
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center,
+                    TextColor = Colors.White,
                 },
 
             };
@@ -81,6 +83,7 @@ namespace MPWordleClient
                     WidthRequest = dimension,
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center,
+                    TextColor = Colors.White
                 },
             };
 

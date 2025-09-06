@@ -222,6 +222,7 @@ namespace MPWordleClient
 
         public async void OnGameOver(Object? sender, Dictionary<string, int> scores_data)
         {
+            // TODO: Pop pages off when pushing a new one to save on memory usage
             await Navigation.PushModalAsync(new PostGame(scores_data));
         }
 

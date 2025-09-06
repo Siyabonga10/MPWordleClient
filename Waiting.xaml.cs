@@ -28,14 +28,11 @@ namespace MPWordleClient
 
         public void OnPlayerJoined(Object? sender, string playerUsername)
         {
+            var style = Application.Current?.Resources["PlayerLabel"] as Style;
             Label NewPlayerLb = new()
             {
                 Text = $"{playerUsername}",
-                VerticalOptions = LayoutOptions.Start,
-                FontSize = 30,
-                Margin = new(50, 0, 0, 0),
-                TextColor = Colors.Black,
-                FontAttributes = FontAttributes.Bold,
+                Style = style
             };
             PlayersList.Add(NewPlayerLb);
         }

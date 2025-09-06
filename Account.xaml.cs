@@ -1,12 +1,17 @@
+using Microsoft.Extensions.Logging;
+
 namespace MPWordleClient;
 
 public partial class Account : ContentPage
 {
-	public Account()
+	private ILogger<Account> _logger;
+	public Account(ILogger<Account> logger)
 	{
+		_logger = logger;
 		InitializeComponent();
 		LoginBtn.WidthRequest = CreateAccBtn.Width;
-	}
+
+    }
 
     override protected async void OnAppearing()
 	{

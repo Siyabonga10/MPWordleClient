@@ -9,22 +9,13 @@
             AlignItems="Center">
         <Button
             x:Name="CreateGameBtn"
-            FontSize="25"
             Text="Create Game"
-            BackgroundColor="{StaticResource PaleGreen}"
             Clicked="OnCreateGame"
-            Margin="20"
-            FontAttributes="Bold"
-            TextColor="White"
             />
         <Button
             x:Name="JoinGameBtn"
-            FontSize="25"
             Text="Join Game"
-            BackgroundColor="{StaticResource PaleGreen}"
             Clicked="OnJoinGame"
-            FontAttributes="Bold"
-            TextColor="White"
             />
 
     </FlexLayout>

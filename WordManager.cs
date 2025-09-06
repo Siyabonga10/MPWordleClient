@@ -50,7 +50,7 @@ namespace MPWordleClient
                 if (compWord[i] == letter)
                 {
                     compWord[i] = '#';
-                    colors.Add(Colors.Green);
+                    colors.Add((Color)Application.Current.Resources["PaleGreen"]);
                 }
                 
                 else
@@ -65,7 +65,7 @@ namespace MPWordleClient
                     if(idx != i)
                     {
                         compWord[idx] = '#';
-                        colors[i] = Colors.Yellow;
+                        colors[i] = (Color)Application.Current.Resources["PaleYellow"];
                     }
                 }
             }

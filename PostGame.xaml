@@ -6,10 +6,7 @@
     <VerticalStackLayout>
         <Label 
             Text="Game Over"
-            FontSize="30"
-            FontAttributes="Bold"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+            Style="{StaticResource BaseLabel}" />
         <VerticalStackLayout x:Name="PlayerList">
             
         </VerticalStackLayout>

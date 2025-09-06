@@ -11,6 +11,7 @@
             x:Name ="TimerLabel" 
             FontSize="42"
             Text="{Binding TimeText}"
+            Style="{StaticResource BaseLabel}"
             >
             
         </Label>
