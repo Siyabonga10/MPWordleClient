@@ -15,11 +15,12 @@ namespace MPWordleClient
 
         private static Border CreateKeypad(int width, int height)
         {
+            var color = Application.Current?.Resources["BorderAccent"] as Color;
             Border keypad = new()
             {
       
                 StrokeThickness = 2,
-                Stroke = new SolidColorBrush((Color)Application.Current.Resources["BorderAccent"]),
+                Stroke = new SolidColorBrush(color),
                 StrokeShape = new RoundRectangle
                 {
                     CornerRadius = new CornerRadius(2)
@@ -67,9 +68,10 @@ namespace MPWordleClient
         {
             var dimension = DisplayWidth / 7;
             dimension = Math.Clamp(dimension, 40, 90); // Ensure a reasonable size
+            var color = Application.Current?.Resources["BorderAccent"] as Color;
             Border label = new()
             {
-                Stroke = new SolidColorBrush((Color)Application.Current.Resources["BorderAccent"]),
+                Stroke = new SolidColorBrush(color),
                 StrokeThickness = 2,
                 StrokeShape = new RoundRectangle
                 {
@@ -127,13 +129,17 @@ namespace MPWordleClient
         public static void SetKeypadColor(Grid keyboard, char letter, Color color)
         {
             Border? keypad = GetKeypad(keyboard, letter);
+            var pale_green = Application.Current?.Resources["PaleGreen"] as Color;
+            var pale_yellow = Application.Current?.Resources["PaleYellow"] as Color;
+            var light_grey = Application.Current?.Resources["LightGrey"] as Color;
+            var dark_grey = Application.Current?.Resources["DarkGrey"] as Color;
             if (keypad != null)
             {
-                if (keypad.BackgroundColor == Application.Current.Resources["PaleGreen"] as Color)
+                if (keypad.BackgroundColor == pale_green)
                     return;
-                else if (keypad.BackgroundColor == Application.Current.Resources["PaleYellow"] && color == Application.Current.Resources["PaleGreen"])
+                else if (keypad.BackgroundColor == pale_yellow && color == pale_green)
                     keypad.BackgroundColor = color;
-                else if (keypad.BackgroundColor == Application.Current.Resources["LightGrey"] || keypad.BackgroundColor == Application.Current.Resources["DarkGrey"])
+                else if (keypad.BackgroundColor == light_grey || keypad.BackgroundColor == dark_grey)
                     keypad.BackgroundColor = color;
             }
         }
@@ -164,7 +170,7 @@ namespace MPWordleClient
         public static async Task AnimateGridRow(Grid gridLayout, int row, int col)
         {
             Border? cell = GetGridElement(gridLayout, row, col);
-            Label? label = (Label?)cell.Content;
+            Label? label = (Label?)cell?.Content;
             string tmp = label?.Text ?? string.Empty;
             if (cell != null)
             {
