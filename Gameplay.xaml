@@ -3,10 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MPWordleClient.Gameplay">
 
-    <FlexLayout BackgroundColor="{StaticResource Background}" 
+    <FlexLayout 
             Direction="Column" 
             JustifyContent="SpaceBetween"
             AlignItems="Center">
+        <Label
+            x:Name ="TimerLabel" 
+            FontSize="42"
+            Text="{Binding TimeText}"
+            >
+            
+        </Label>
         <Grid x:Name="GridLayout" 
               RowDefinitions="*, *, *, *, *" 
               ColumnDefinitions="*, *, *, *, *">

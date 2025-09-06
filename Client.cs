@@ -25,7 +25,7 @@ namespace MPWordleClient
         private static List<string> EventBuffer = [];
         private static EventParsingStage CurrentStage = EventParsingStage.WAITING;
         private static readonly Dictionary<string, EventProcessor> EventHandlers = [];
-        private static readonly CookieContainer cookieContainer;
+        private static CookieContainer cookieContainer;
         static MpClient()
         {
             cookieContainer = new CookieContainer();
@@ -45,13 +45,13 @@ namespace MPWordleClient
         public static async Task<bool> CheckLoggedin()
         {
             var token = await SecureStorage.GetAsync("jwt_token");
-            AppLogger.Logger?.LogInformation(HttpClient.BaseAddress?.ToString());
             if (token == null)
                 return false;
             
             cookieContainer.Add(new Uri(BaseUrl), new Cookie("jwt_token", token));
-            AppLogger.Logger?.LogInformation("DONE");
-            return true;
+            // Check with server if token is still valid
+            var response = await HttpClient.GetAsync(BaseUrl + "/player");
+            return response.StatusCode == HttpStatusCode.OK;
         }
         public static async Task<(bool LoggedIn, string OutcomeMsg)> LoginPlayerAsync(string username, string password)
         {
@@ -98,7 +98,6 @@ namespace MPWordleClient
         public static async Task<string> CreateGame()
         {
             var response = await HttpClient.PostAsync(BaseUrl + "/game", null);
-            
             if(response.StatusCode == HttpStatusCode.Created)
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -121,7 +120,6 @@ namespace MPWordleClient
                 var response = await HttpClient.GetAsync(BaseUrl + $"/game/{gameID}",
                     HttpCompletionOption.ResponseHeadersRead,
                     _cancellationTokenSource.Token);
-
                 response.EnsureSuccessStatusCode();
 
                 using var stream = await response.Content.ReadAsStreamAsync();

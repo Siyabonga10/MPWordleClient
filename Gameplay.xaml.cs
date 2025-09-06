@@ -1,17 +1,38 @@
-﻿using Microsoft.Maui.Controls.Shapes;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Timers;
+using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Shapes;
 
 namespace MPWordleClient
 {
-    public partial class Gameplay : ContentPage
+    public partial class Gameplay : ContentPage, INotifyPropertyChanged
     {
         int RowIndex = 0;
         int ColumnIndex = 0;
         readonly int height;
         readonly int width;
         Task? computingResult;
-        public Gameplay()
+        private readonly int total_time = 120;
+        private int current_time = 120;
+        private string _timeText;
+        public string TimeText
         {
+            get => _timeText;
+            set
+            {
+                _timeText = value;
+                OnPropertyChanged();
+            }
+        }
+        private System.Timers.Timer timer;
+        private readonly ILogger<Gameplay> _logger;
+        public event PropertyChangedEventHandler? _propertyChanged;
+        public Gameplay(ILogger<Gameplay> logger)
+        {
+            _logger = logger;
             computingResult = null;
+            
             InitializeComponent();
             WordManager.GetNewWord();
 
@@ -24,7 +45,31 @@ namespace MPWordleClient
 
             InitialiseGrid();
             InitialiseKeyboard();
+            _timeText = "00:00";
+            current_time = 120;
+            timer = new System.Timers.Timer(1000);
+            timer.Elapsed += OnEverySecond;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+            this.BindingContext = this;
+            TimerLabel.SetBinding(Label.TextProperty, static (Gameplay pg) => pg.TimeText);
+        }
 
+        private void OnEverySecond(object? Timer, ElapsedEventArgs e)
+        {
+            current_time -= 1;
+            TimeText = "";
+            if(current_time >= 60)
+            {
+                TimeText += $"{current_time / 60}:";
+            }
+            TimeText += (current_time % 60).ToString();
+            if(current_time == -1)
+            {
+                timer.Enabled = false;
+                timer.AutoReset = false;
+                _logger.LogInformation("Times up!!!!!!!!");
+            }
         }
 
         private void InitialiseGrid()
@@ -165,6 +210,12 @@ namespace MPWordleClient
         {
             await DisplayAlert(heading, message, "OK");
             Reset();
+        }
+
+        protected override void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            _propertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); 
+            base.OnPropertyChanged(propertyName);
         }
 
     }

@@ -17,7 +17,7 @@ namespace MPWordleClient
         {
             Border keypad = new()
             {
-                BackgroundColor = Application.Current.Resources["LightGrey"] as Color ?? Colors.LightGray,
+      
                 StrokeThickness = 0,
                 StrokeShape = new RoundRectangle
                 {
@@ -29,7 +29,6 @@ namespace MPWordleClient
                     FontSize = 20,
                     HeightRequest = height,
                     WidthRequest = width,
-                    TextColor = Colors.White,
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center,
                 },
@@ -80,7 +79,6 @@ namespace MPWordleClient
                     FontAttributes = FontAttributes.Bold,
                     HeightRequest = dimension,
                     WidthRequest = dimension,
-                    TextColor = Colors.White,
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center,
                 },
