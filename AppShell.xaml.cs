@@ -7,6 +7,7 @@
             InitializeComponent();
             Routing.RegisterRoute("Waiting", typeof(Waiting));
             Routing.RegisterRoute("Gameplay", typeof(Gameplay));
+            Routing.RegisterRoute("PostGame", typeof(PostGame));
         }
     }
 }

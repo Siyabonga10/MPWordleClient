@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Timers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Shapes;
@@ -13,8 +14,7 @@ namespace MPWordleClient
         readonly int height;
         readonly int width;
         Task? computingResult;
-        private readonly int total_time = 120;
-        private int current_time = 120;
+        private int current_time = 30;
         private string _timeText;
         public string TimeText
         {
@@ -46,16 +46,18 @@ namespace MPWordleClient
             InitialiseGrid();
             InitialiseKeyboard();
             _timeText = "00:00";
-            current_time = 120;
+            current_time = 30;
             timer = new System.Timers.Timer(1000);
             timer.Elapsed += OnEverySecond;
             timer.AutoReset = true;
             timer.Enabled = true;
             this.BindingContext = this;
             TimerLabel.SetBinding(Label.TextProperty, static (Gameplay pg) => pg.TimeText);
+
+            MpClient.GameOverUpdate += OnGameOver;
         }
 
-        private void OnEverySecond(object? Timer, ElapsedEventArgs e)
+        private async void OnEverySecond(object? Timer, ElapsedEventArgs e)
         {
             current_time -= 1;
             TimeText = "";
@@ -68,7 +70,7 @@ namespace MPWordleClient
             {
                 timer.Enabled = false;
                 timer.AutoReset = false;
-                _logger.LogInformation("Times up!!!!!!!!");
+                await MpClient.SubmitPostGameResults(Game.GameID, 10);
             }
         }
 
@@ -216,6 +218,11 @@ namespace MPWordleClient
         {
             _propertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); 
             base.OnPropertyChanged(propertyName);
+        }
+
+        public async void OnGameOver(Object? sender, Dictionary<string, int> data)
+        {
+            await Shell.Current.GoToAsync("PostGame");
         }
 
     }

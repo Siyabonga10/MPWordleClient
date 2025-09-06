@@ -18,11 +18,17 @@ namespace MPWordleClient
     {
         public static HttpClient HttpClient { get; }
         private static readonly string BaseUrl = "http://10.0.2.2:5264";
+
         public static event EventHandler<string> PlayerJoinedEvent;
         public static event EventHandler<IEnumerable<string>> StartGame;
         public static event EventHandler<List<string>> PlayersInGameEvent;
+        public static event EventHandler<Dictionary<string, int>> GameOverUpdate;
+
         private static string CurrentEventType = string.Empty;
+
         private static List<string> EventBuffer = [];
+        private static readonly Dictionary<string, int> ResultsBuffer = [];
+
         private static EventParsingStage CurrentStage = EventParsingStage.WAITING;
         private static readonly Dictionary<string, EventProcessor> EventHandlers = [];
         private static CookieContainer cookieContainer;
@@ -40,6 +46,7 @@ namespace MPWordleClient
             EventHandlers.Add(EventTypes.PlayerJoined, OnPlayerJoined);
             EventHandlers.Add(EventTypes.PlayersInGame, OnPlayersInGame);
             EventHandlers.Add(EventTypes.StartGame, OnStartGame);
+            EventHandlers.Add(EventTypes.WinnerUpdate, OnGameOver);
         }
 
         public static async Task<bool> CheckLoggedin()
@@ -73,6 +80,15 @@ namespace MPWordleClient
                 return (false, "Username already exists");
             else
                 return (false, "Server error");
+        }
+
+        public static async Task<bool> SubmitPostGameResults(string gameId, int score)
+        {
+            
+            var content = JsonContent.Create(score);
+            var response = await HttpClient.PostAsync(BaseUrl + $"/game/{gameId}/results", content);
+            Console.WriteLine(response.ToString());
+            return response.IsSuccessStatusCode;
         }
 
         private static async Task<HttpResponseMessage> PlayerAuth(string username, string password, string endpoint)
@@ -226,6 +242,28 @@ namespace MPWordleClient
             else
             {
                 EventBuffer.Add(line.Trim());
+            }
+        }
+
+        private static void OnGameOver(string line)
+        {
+            if (line == string.Empty)
+            {
+                CurrentStage = EventParsingStage.WAITING;
+                GameOverUpdate.Invoke(null, ResultsBuffer);
+                ResultsBuffer.Clear();
+                return;
+            }
+            else
+            {
+                try
+                {
+                    string res_username = line.Split(":")[0];
+                    int res = int.Parse(line.Split(":")[1]);
+                    ResultsBuffer.Add(res_username, res);
+                } catch (Exception)
+                { }
+                
             }
         }
     }
