@@ -220,9 +220,9 @@ namespace MPWordleClient
             base.OnPropertyChanged(propertyName);
         }
 
-        public async void OnGameOver(Object? sender, Dictionary<string, int> data)
+        public async void OnGameOver(Object? sender, Dictionary<string, int> scores_data)
         {
-            await Shell.Current.GoToAsync("PostGame");
+            await Navigation.PushAsync(new PostGame(scores_data));
         }
 
     }

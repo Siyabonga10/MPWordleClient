@@ -87,7 +87,6 @@ namespace MPWordleClient
             
             var content = JsonContent.Create(score);
             var response = await HttpClient.PostAsync(BaseUrl + $"/game/{gameId}/results", content);
-            Console.WriteLine(response.ToString());
             return response.IsSuccessStatusCode;
         }
 
@@ -261,9 +260,10 @@ namespace MPWordleClient
                     string res_username = line.Split(":")[0];
                     int res = int.Parse(line.Split(":")[1]);
                     ResultsBuffer.Add(res_username, res);
-                } catch (Exception)
+                }
+                catch (Exception)
                 { }
-                
+
             }
         }
     }

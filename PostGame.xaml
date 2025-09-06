@@ -5,8 +5,13 @@
              Title="PostGame">
     <VerticalStackLayout>
         <Label 
-            Text="Welcome to .NET MAUI!"
+            Text="Game Over"
+            FontSize="30"
+            FontAttributes="Bold"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
+        <VerticalStackLayout x:Name="PlayerList">
+            
+        </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentPage>
